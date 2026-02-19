@@ -27,8 +27,8 @@ export class UsersController {
   @Roles('admin')
   @Get()
   async all() {
-    const users = await this.usersService.findAll();
-    return users.map(({ password: _password, ...rest }) => rest);
+    return await this.usersService.findAll();
+    // return users.map(({ password: _password, ...rest }) => rest);
   }
 
   @ApiBearerAuth()
@@ -52,5 +52,10 @@ export class UsersController {
   async deleteUser(@Param('id') id: string) {
     await this.usersService.remove(id);
     return { message: 'User deleted successfully' };
+  }
+
+  @Get('admin')
+  async getAdmins() {
+    return this.usersService.getAdmins();
   }
 }

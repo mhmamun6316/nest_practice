@@ -30,7 +30,7 @@ export class UsersService {
   }
 
   async findAll(): Promise<User[]> {
-    return this.userModel.find().lean();
+    return this.userModel.find().select('-password').lean();
   }
 
   async findByEmail(email: string) {
@@ -53,5 +53,45 @@ export class UsersService {
   // Delete user
   async remove(id: string) {
     return this.userModel.findByIdAndDelete(id);
+  }
+
+  //only admin
+  async getAdmins() {
+    return this.userModel.find({ role: 'admin' }).select('-password').lean();
+  }
+
+  //findByAdmin
+  async findByEmails(email: string) {
+    return this.userModel.findOne({ email }).lean();
+  }
+
+  async recentUsers() {
+    return this.userModel
+      .find()
+      .sort({ createdAt: -1 })
+      .limit(5)
+      .select('-password')
+      .lean();
+  }
+
+  async searchByName(name: string) {
+    return this.userModel
+      .find({ name: { $regex: name, $options: 'i' } })
+      .select('-password')
+      .lean();
+  }
+
+  async usersWithPhone() {
+    return this.userModel
+      .find({ phone: { $exists: true, $ne: null } })
+      .select('-password')
+      .lean();
+  }
+
+  async usersByRoles() {
+    return this.userModel
+      .find({ role: { $in: ['admin', 'manager'] } })
+      .select('-password')
+      .lean();
   }
 }
